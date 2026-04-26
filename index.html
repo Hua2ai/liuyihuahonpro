@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>內地電商浪潮南下，香港零售如何重塑</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
+    </script>
+    <style>
+        :root {
+            --bg-primary: #fef5f5;
+            --bg-secondary: #fefaf9;
+            --bg-card: #ffffff;
+            --bg-nav: #fffbfb;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted: #6b6b6b;
+            --accent: #b91c1c;
+            --accent-light: #dc2626;
+            --accent-soft: #fde8e8;
+            --border: #f0d0d0;
+            --border-light: #f8e0e0;
+            --shadow-sm: 0 1px 3px rgba(180, 30, 30, 0.06);
+            --shadow-md: 0 4px 16px rgba(180, 30, 30, 0.08);
+            --shadow-lg: 0 8px 32px rgba(180, 30, 30, 0.10);
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 16px;
+            --max-width: 780px;
+            --sidebar-width: 260px;
+            --transition: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-h1: 2.2rem;
+            --font-h2: 1.6rem;
+            --font-h3: 1.25rem;
+            --font-h4: 1.1rem;
+            --font-subtitle: 1.15rem;
+            --font-body: 1rem;
+            --font-small: 0.8rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 20px;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang HK', 'Noto Sans HK', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            transition: margin-left var(--transition);
+            margin-left: 0;
+        }
+
+        /* 侧边栏打开时，主内容向右平移 */
+        body.sidebar-open {
+            margin-left: var(--sidebar-width);
+        }
+
+        /* ============ 左侧导航侧边栏 ============ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-nav);
+            border-right: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+            z-index: 1100;
+            transform: translateX(-100%);
+            transition: transform var(--transition);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-close-btn {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background var(--transition);
+            line-height: 1;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-close-btn:hover {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 10px 14px;
+            border-radius: 8px;
+            transition: all var(--transition);
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a:focus {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 1099;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition);
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* 打开侧边栏的浮动按钮 */
+        .sidebar-toggle-floating {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            z-index: 1050;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+            width: 36px;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
+            padding: 12px 6px;
+        }
+
+        .sidebar-toggle-floating:hover {
+            background: var(--accent-soft);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-toggle-floating span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: all var(--transition);
+        }
+
+        .sidebar-toggle-floating.hidden-btn {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-50%) translateX(-10px);
+        }
+
+        /* ============ 主容器 ============ */
+        .main-container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+            transition: padding-left var(--transition);
+        }
+
+        /* ============ 文章头部 ============ */
+        .article-header {
+            text-align: center;
+            padding: 16px 0 8px;
+            margin-bottom: 8px;
+        }
+
+        .article-header h1 {
+            font-size: var(--font-h1);
+            font-weight: 800;
+            line-height: 1.35;
+            letter-spacing: -0.02em;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .article-header .subtitle {
+            font-size: var(--font-subtitle);
+            color: var(--text-muted);
+            font-weight: 400;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto 20px;
+        }
+
+        .article-meta {
+            font-size: var(--font-small);
+            color: var(--text-muted);
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border-light);
+            margin: 16px 0 28px;
+        }
+
+        /* ============ 章节样式 ============ */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: var(--font-h2);
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+            line-height: 1.35;
+        }
+
+        .section h3 {
+            font-size: var(--font-h3);
+            font-weight: 700;
+            color: #2a2a2a;
+            margin: 24px 0 8px;
+            letter-spacing: -0.005em;
+        }
+
+        .section h4 {
+            font-size: var(--font-h4);
+            font-weight: 700;
+            color: #333;
+            margin: 16px 0 6px;
+        }
+
+        .section p {
+            margin-bottom: 14px;
+            color: var(--text-secondary);
+            font-size: var(--font-body);
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        .section .lead {
+            font-size: 1.1rem;
+            color: #3a3a3a;
+            font-weight: 500;
+        }
+
+        /* ============ 信息图卡片 (infographic) ============ */
+        .infographic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin: 20px 0 28px;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 18px 16px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow var(--transition), transform var(--transition);
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .info-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .info-card .info-icon {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+        }
+
+        .info-card .info-value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1.2;
+            margin-bottom: 2px;
+        }
+
+        .info-card .info-value.negative {
+            color: #c0392b;
+        }
+
+        .info-card .info-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .info-card .info-sub {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        /* 点击后展开的详情文字 */
+        .info-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            font-size: 0.78rem;
+            color: #5a5a5a;
+            line-height: 1.6;
+            padding: 0 8px;
+            background: #fef9f9;
+            margin-top: 4px;
+            border-radius: 6px;
+            text-align: left;
+        }
+
+        .info-card.expanded .info-detail {
+            max-height: 300px;
+            padding: 10px 10px;
+        }
+
+        .info-card .expand-hint {
+            font-size: 0.65rem;
+            color: #b0b0b0;
+            margin-top: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        /* ============ 图表容器 ============ */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 20px 18px 14px;
+            margin: 22px 0 28px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-container .chart-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .chart-container .chart-source {
+            font-size: 0.7rem;
+            color: #999;
+            text-align: right;
+            margin-top: 6px;
+        }
+
+        .chart-container canvas {
+            width: 100% !important;
+            max-height: 380px;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        @media (max-width: 640px) {
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 制作图标记文本 */
+        .chart-note {
+            font-size: 0.78rem;
+            color: #8b6b6b;
+            background: #fff5f5;
+            padding: 10px 14px;
+            border-left: 3px solid var(--accent-light);
+            margin-bottom: 10px;
+            border-radius: 4px;
+            line-height: 1.5;
+        }
+
+        /* ============ 时间轴 ============ */
+        .timeline {
+            position: relative;
+            padding-left: 28px;
+            margin: 22px 0 28px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 4px;
+            bottom: 4px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-light), var(--border), var(--accent-light));
+            border-radius: 1px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 16px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 3px var(--accent-soft);
+            z-index: 1;
+        }
+
+        .timeline-date {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.02em;
+            margin-bottom: 2px;
+        }
+
+        .timeline-content {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* ============ 图片占位符 ============ */
+        .img-placeholder {
+            background: #fdf0f0;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+            color: #c09090;
+            font-size: 0.85rem;
+            margin: 12px 0;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .img-placeholder.small {
+            min-height: 100px;
+            font-size: 0.78rem;
+        }
+
+        .img-placeholder .ph-text {
+            font-weight: 500;
+        }
+
+        /* 图集轮播 */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            margin: 18px 0;
+            background: #fff;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+
+        .carousel-slides {
+            display: flex;
+            transition: transform 0.4s ease;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fdf0f0;
+            min-height: 220px;
+            font-size: 0.9rem;
+            color: #c09090;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--border-light);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #555;
+            transition: 0.2s;
+            z-index: 2;
+        }
+
+        .carousel-btn:hover {
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .carousel-btn.prev {
+            left: 8px;
+        }
+
+        .carousel-btn.next {
+            right: 8px;
+        }
+
+        /* ============ 视频占位符 ============ */
+        .video-placeholder {
+            background: #1a1a1a;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 280px;
+            margin: 18px 0;
+            color: #fff;
+            font-size: 0.9rem;
+            flex-direction: column;
+            gap: 8px;
+            cursor: pointer;
+            transition: opacity var(--transition);
+        }
+
+        .video-placeholder:hover {
+            opacity: 0.9;
+        }
+
+        .video-placeholder .play-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        /* ============ 引用块 ============ */
+        blockquote {
+            border-left: 3px solid var(--accent-light);
+            background: #fffbfb;
+            padding: 16px 20px;
+            margin: 18px 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            color: #5a3a3a;
+            font-style: italic;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        blockquote cite {
+            display: block;
+            font-style: normal;
+            font-size: 0.78rem;
+            color: #999;
+            margin-top: 6px;
+        }
+
+        /* ============ 页脚 ============ */
+        .article-footer {
+            text-align: center;
+            padding: 30px 0 10px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .article-footer .source-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0;
+            font-size: 0.75rem;
+            color: #999;
+            line-height: 1.8;
+        }
+
+        /* ============ 返回顶部按钮 ============ */
+        .back-to-top {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 900;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            transition: all var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .back-to-top:hover {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        /* ============ 右侧时间轴面板 ============ */
+        .timeline-panel {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            z-index: 1050;
+            display: flex;
+            align-items: flex-start;
+            transition: right 0.35s ease;
+        }
+        .timeline-panel-tab {
+            writing-mode: vertical-rl;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+            padding: 16px 10px;
+            cursor: pointer;
+            box-shadow: -2px 2px 10px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.04em;
+            transition: background 0.2s;
+        }
+        .timeline-panel-tab:hover {
+            background: var(--accent-soft);
+        }
+        .tab-arrow {
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+        .timeline-panel-content {
+            width: 320px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 0 12px 12px 0;
+            box-shadow: var(--shadow-md);
+            padding: 20px;
+            transition: width 0.35s ease, padding 0.35s ease, opacity 0.3s;
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .timeline-panel.expanded .timeline-panel-content {
+            width: 320px;
+            padding: 20px;
+            opacity: 1;
+            overflow-y: auto;
+        }
+        .timeline-panel.expanded .tab-arrow {
+            transform: rotate(180deg);
+        }
+        .timeline-panel-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: #1a1a1a;
+            text-align: center;
+        }
+        /* 移动端调整宽度 */
+        @media (max-width: 768px) {
+            .timeline-panel-content,
+            .timeline-panel.expanded .timeline-panel-content {
+                width: 260px;
+            }
+            .timeline-panel-tab {
+                padding: 12px 8px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* ============ 响应式 ============ */
+        @media (max-width: 768px) {
+            body.sidebar-open {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                width: 75vw;
+                max-width: 300px;
+            }
+
+            .sidebar-toggle-floating {
+                width: 30px;
+                height: 70px;
+            }
+
+            .article-header h1 {
+                font-size: 1.6rem;
+            }
+
+            .section h2 {
+                font-size: 1.3rem;
+            }
+
+            .section h3 {
+                font-size: 1.1rem;
+            }
+
+            .infographic-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .info-card {
+                padding: 14px 10px;
+            }
+
+            .info-card .info-value {
+                font-size: 1.1rem;
+            }
+
+            .chart-container {
+                padding: 14px 10px 10px;
+            }
+
+            .timeline {
+                padding-left: 22px;
+            }
+
+            .timeline-item {
+                padding-left: 10px;
+            }
+
+            .timeline-item::before {
+                left: -20px;
+                width: 8px;
+                height: 8px;
+            }
+
+            .back-to-top {
+                bottom: 18px;
+                right: 16px;
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .infographic-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .article-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .main-container {
+                padding: 20px 12px 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==================== 左侧导航侧边栏 ==================== -->
+    <aside class="sidebar" id="sidebar" aria-label="側邊導航">
+        <button class="sidebar-close-btn" id="sidebarClose" aria-label="收起導航">&times;</button>
+        <ul class="sidebar-nav" role="menu">
+            <li><a href="#sec1" role="menuitem">零售下滑</a></li>
+            <li><a href="#sec2" role="menuitem">電商南下</a></li>
+            <li><a href="#sec3" role="menuitem">學生視角</a></li>
+            <li><a href="#sec4" role="menuitem">跨境供應鏈</a></li>
+            <li><a href="#sec5" role="menuitem">新常態</a></li>
+            <li><a href="#sec6" role="menuitem">未來展望</a></li>
+        </ul>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- 打开侧边栏的浮动按钮 -->
+    <button class="sidebar-toggle-floating" id="sidebarToggleFloating" aria-label="打開導航" title="打開導航">
+        <span></span><span></span><span></span>
+    </button>
+
+    <!-- ==================== 主内容 ==================== -->
+    <main class="main-container" id="top">
+
+        <!-- ========== 文章头部 ========== -->
+        <header class="article-header">
+            <h1>內地電商浪潮南下，香港零售如何重塑</h1>
+            <p class="subtitle">從「購物天堂」到十字路口——跨境供應鏈如何改寫香港零售業的命運</p>
+            <div class="article-meta">
+                <span>2026年4月27日</span>
+                <span>香港浸會大學</span>
+                <span>劉懿華</span>
+            </div>
+        </header>
+        <hr class="divider">
+
+        <!-- ========== 第一部分：不同的軌跡 ========== -->
+        <section class="section" id="sec1">
+            <h2>不同的軌跡——香港零售業的下滑與內地電商平台的崛起</h2>
+            <p>曾經，香港是以國際化優質商品而聞名的亞洲購物天堂，從家居物品、電子產品到食品藥品，這裡是消費者購物的不二選擇。但自疫情以來，香港零售額的增長被打斷，零售業正經歷變革，熙熙攘攘的街邊商業和豪華奢侈的商場變少，零售數據相比疫情前「一落千丈」。</p>
+            <p>與此同時，口岸邊境另一邊的內地，電商平台利用疫情時團購、外賣配送等契機，逐步發展壯大、完善平台科技與用戶體驗，徹底打破了傳統購物模式的地域限制。現如今，內地電商不再是香港零售業遙遠的競爭對手，已經深入香港的每一片城區、每一條街道，融入了香港市民的生活之中，將各類數碼產品、生活用品甚至新鮮食物送到用戶的家門口。</p>
+
+            <h3>香港零售的下滑之路</h3>
+            <p>數據直觀生動地描繪出香港零售業的掙扎處境。根據香港政府統計處的數據，香港零售業總銷貨額在疫情後的2023年恢復到4066.49億港元，但到了2024年底，這個數字降低到了3768.47億港元，同比下降7.3%。2025年的數據雖略有增長，但也僅有1%，年零售業總銷貨額為3804.45億港元。若考慮匯率、通貨膨脹等其他因素，這一數字也許只是原地踏步而非進步。
+            </p>
+
+            <div class="chart-container">
+                <div class="chart-title">香港零售業總銷貨價值趨勢（2019–2025）</div>
+                <canvas id="chartRetailValue" aria-label="香港零售業總銷貨價值柱狀圖與按年變動百分率折線圖"></canvas>
+                <div class="chart-source">數據來源：香港政府統計處 · 零售業總銷貨額</div>
+            </div>
+
+            <p>不僅是總銷貨額，其他方面的數據也可以反映出香港零售業正在遭遇一場「寒冬」。</p>
+
+            <!-- Infographic 卡片网格 -->
+            <div class="infographic-grid" id="infographicGrid">
+                <div class="info-card" data-detail="根據香港小微企業商業信心指數顯示，2026年1月，零售業信心指數從42.1下降到38.4。">
+                    <div class="info-icon">📊</div>
+                    <div class="info-value negative">42.1⬇️38.4</div>
+                    <div class="info-label">零售業信心指數</div>
+                    <div class="info-detail"></div>
+                    <div class="expand-hint">點擊查看詳情</div>
+                </div>
+                <div class="info-card" data-detail="根據香港小微企業商業信心指數顯示，2026年1月，批發業信心指數從44.3降為40.7。">
+                    <div class="info-icon">📊</div>
+                    <div class="info-value negative">44.3⬇️40.7</div>
+                    <div class="info-label">批發業信心指數</div>
+                    <div class="info-detail"></div>
+                    <div class="expand-hint">點擊查看詳情</div>
+                </div>
+                <div class="info-card" data-detail="零售業的光輝代表——位於銅鑼灣的時代廣場，2025年收入下滑至9億港元，相比2024年的11億港元萎縮了18%。">
+                    <div class="info-icon">🏢</div>
+                    <div class="info-value negative">-18%</div>
+                    <div class="info-label">時代廣場收入萎縮</div>
+                    <div class="info-sub">銅鑼灣 · 11億→9億港元</div>
+                    <div class="info-detail"></div>
+                    <div class="expand-hint">點擊查看詳情</div>
+                </div>
+                <div class="info-card" data-detail="由香港房屋委員會管理的社區必需零售空間，預計淨收入也將在2026/27財年降至12.81億港元，與預算相比少了3400萬港元。">
+                    <div class="info-icon">🏘️</div>
+                    <div class="info-value">12.81億</div>
+                    <div class="info-label">社區零售空間預計淨收入減少</div>
+                    <div class="info-sub">2026/27財年 · 較預算少3,400萬</div>
+                    <div class="info-detail"></div>
+                    <div class="expand-hint">點擊查看詳情</div>
+                </div>
+                <div class="info-card" data-detail="根據差餉物業估價署數據顯示，截至2025年3月，零售物業價格同比下跌16.3%，租金下跌5.2%。">
+                    <div class="info-icon">📉</div>
+                    <div class="info-value negative">-16.3%</div>
+                    <div class="info-label">零售物業價格同比下跌</div>
+                    <div class="info-sub">截至2025年3月 · 差餉物業估價署</div>
+                    <div class="info-detail"></div>
+                    <div class="expand-hint">點擊查看詳情</div>
+                </div>
+                <div class="info-card" data-detail="仲量聯行2026年4月的展望報告提到核心地段的零售租金在年內可能進一步下跌5%至10%。">
+                    <div class="info-icon">💸</div>
+                    <div class="info-value negative">-5.2%</div>
+                    <div class="info-label">零售租金同比下跌</div>
+                    <div class="info-sub">核心地段或再跌5-10%</div>
+                    <div class="info-detail"></div>
+                    <div class="expand-hint">點擊查看詳情</div>
+                </div>
+            </div>
+            <p style="font-size:0.78rem;color:#999;text-align:right;">數據來源：香港小微企業商業信心指數、差餉物業估價署、仲量聯行2026年4月展望報告</p>
+        </section>
+
+        <hr class="divider">
+
+        <!-- ========== 第二部分：電商南下 ========== -->
+        <section class="section" id="sec2">
+            <h3>內地電商的南下「攻港」</h3>
+            <p>在香港零售業經歷下滑的同時，另一個生態系統卻在快速擴展。2024年10月1日，淘寶公佈了香港地區99元包郵的政策。而拼多多則更加誇張，幾乎所有商品都免除運費，無論是數公斤重的商品還是僅價值一塊錢的小物件。京東也不甘示弱，他們表示如果商品有更低的價格他們都會匹配，「買貴就賠」。
+            </p>
+            <p>這一切都不是欺騙消費者的行為，而是經過計算後的市場擴張。從前高昂且不便利的運輸與提貨這一障礙不再存在。香港消費者的消費行為變化果斷且迅速，根據摩根大通2025年12月發佈的報告，內地平台在香港月活躍用戶中的市場份額不斷增長，其中拼多多最為突出，其2025年市場份額從1月的12%激增到了10月的28%。</p>
+            
+
+            <div class="chart-container">
+                <div class="chart-title">內地電商在港市場份額變化（2025年1月–10月）</div>
+                <canvas id="chartMarketShare" aria-label="內地電商平台在香港的市場份額變化折線圖"></canvas>
+                <div class="chart-source">數據來源：摩根大通 2025年12月報告</div>
+            </div>
+
+            <p>這份報告指出了其中也許是至關重要的一點：價格。同款雜貨商品，拼多多平台上的價格比本地商超供應鏈便宜42%，而同款家用电器的價格差異更是能達到56%。</p>
+
+
+            <div class="chart-container">
+                <div class="chart-title">內地電商平台與香港實體零售店價格差距對比</div>
+                <canvas id="chartPriceGap" aria-label="各品類價格差距橫向條形圖"></canvas>
+                <div class="chart-source">數據來源：摩根大通 2025年12月報告</div>
+            </div>
+
+            <p>Statrys公司的一項調查也證明了這一轉變：75%的香港網購用戶說自己曾在內地電商平台上購物。香港科技探索（HKTV）副主席王維基在「HKTVmall Vision Day
+            2025」中也提到，香港市民的消費能力並沒有減少，只是消費者的消費習慣發生了顯著變化，從實體店轉向了網購和海外消費，導致實體零售業生意減少。</p>
+        </section>
+        <hr class="divider">
+
+        <!-- ========== 第三部分：學生視角 ========== -->
+        <section class="section" id="sec3">
+            <h3>「免郵區」的生活 —— 一名內地學生的視角</h3>
+            <p>數據反映出的整體趨勢，本質上是由數以萬計的消費者行為組成的。這場香港零售業轉變所帶來的影響，在來港就讀的內地學生這一消費者群體中更容易體現。他們對內地商品和網購都很熟悉，更容易接受使用內地電商平台。吳思澤便是其中的一員。</p>
+            <p>吳思澤是一名目前在香港讀大學本科的內地生，對他來說，內地電商平台在香港的擴張發展從根本上改變了他的日常生活。他回憶到，四年前剛來香港的時候網購還不發達，直到兩年前都幾乎很少網購東西送來香港：「一個問題是運費基本都很貴，有的甚至超過了商品本身的價格；另一個是運送花的時間也基本都很長，取貨也不方便。」
+            </p>
+            <p>然而，「包郵到港」改變了這一切，尤其是拼多多的一件也包郵政策。現在，吳思澤已經是拼多多的忠實用戶。無論是幾塊錢的手機殼，還是很重的整箱礦泉水，他都可以網購然後在離家僅100米的自提點取貨。「現在都感覺不到是在跨境購物，跟在内地網購沒什麼區別了。」他說。</p>
+
+            <div class="img-placeholder">
+                <img src="pickpoint.jpg" alt="香港街頭自提點實景" style="width:50%; height:auto; border-radius:6px;">
+                <span style="font-size:1rem;">吳思澤家附近有許多可供取件的自提點，其中最近的一個僅距離89米</span>
+            </div>
+
+            <p>吳思澤會在拼多多上買各種東西，他說，新鮮水果等容易壞的東西還是會在香港超市裡買，但是雜貨或者不容易壞的東西基本都是網購，包括礦泉水、方便麵、垃圾袋、紙巾等。</p>
+
+            <div class="carousel-container" id="carouselGallery">
+                <div class="carousel-slides" id="carouselSlides">
+                    <div class="carousel-slide">
+                        <img src="wusize1.jpg" alt="吳思澤日常生活照片之一" style="width:100%; height:auto; border-radius:8px;">
+                        <small>吳思澤展示他網購的垃圾袋</small>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="wusize2.jpg" alt="吳思澤日常生活照片之一" style="width:100%; height:auto; border-radius:8px;">
+                        <small>吳思澤展示他網購的水、方便麵、紙巾</small>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="wusize3.jpg" alt="吳思澤日常生活照片之一" style="width:100%; height:auto; border-radius:8px;">
+                        <small>吳思澤展示他網購的水、方便麵、紙巾</small>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="wusize4.jpg" alt="吳思澤日常生活照片之一" style="width:100%; height:auto; border-radius:8px;">
+                        <small>吳思澤網購的半自動洗衣機</small>
+                    </div>
+                </div>
+                <button class="carousel-btn prev" id="carouselPrev">&#10094;</button>
+                <button class="carousel-btn next" id="carouselNext">&#10095;</button>
+            </div>
+
+            <p>促使他轉向內地電商平台最直接的驅動力，毫無疑問是價格差距。內地商品在原本就更便宜的同時，透過包郵到港，徹底擁有了價格優勢。吳思澤說，在香港買一瓶礦泉水要七八塊錢，但在拼多多上一次買一箱，免郵費送到自提點只要二三十塊錢，一個學期下來能省不少錢。他去年網購的一台洗衣機也為他省了不少錢。
+            </p>
+
+            <!-- 视频占位 -->
+            <video controls style="width:100%; border-radius: 10px;">
+                <source src="wusize.mp4" type="video/mp4">
+            </video>
+
+            <p>除了價格之外，網購也對他心理層面上有影響。「畢竟第一次一個人在離家這麼遠的地方生活，有時候還是有點不適應。但是當我快速又便宜地用到以前在家裡用過的牙膏、洗衣液的時候，這種和家裡的距離感就沒有了。」吳思澤說。</p>
+
+            <p>這樣的經歷並不獨屬於吳思澤，相信許多來港的內地人都會在京東、淘寶、拼多多等平台上網購自己熟悉的東西，三四天後就能在住所附近的自提點收到。來港內地學生作為在數字系統中長大的一代，對他們來說，內地電商平台進入香港完全不是生活習慣的破壞，而是期盼已久的事情終於得到實現。他們的網購經歷可以作為香港居民的參考。體驗到便宜且便捷的網購服務後，大家舊有的本地實體購物習慣很容易會得到改變。
+            </p>
+            <p>但是，這種改變不能簡單地理解為內地電商侵佔了本地零售市場、香港零售業衰落是因為內地電商平台的進入。如果香港能夠利用得當內地電商平台，利用好這一套跨境供應鏈，也許能夠幫助零售業以新的形勢從疫情中復甦，甚至發展得更好。</p>
+        </section>
+        <hr class="divider">
+
+        <!-- ========== 第四部分：跨境供應鏈 ========== -->
+        <section class="section" id="sec4">
+            <h2>跨境供應鏈的雙向影響——救命稻草還是壓垮駱駝的最後一根稻草？</h2>
+
+            <h3>自提點在香港的興起</h3>
+            <p>「包郵到港」帶來的最明顯、最迅速的影響，莫過於自提點數量的增長。當數以萬計的包裹每天從內地來到香港時，它們需要一個能夠儲存並派發給用戶的終點。這一需求導致許多便利店、街市空置鋪位變成微型物流樞紐。</p>
+            <p>對於一個街邊小店的店主來說，將店鋪轉型做兼營京東、菜鳥這類的官方自提點，能夠給他們帶來一筆可觀的補貼收入。根據香港01的瞭解計算，一家自提點每天大約能處理100件包裹，電商平台的官方集運服務佣金為一件包裹首公斤拆佣2.5元，其後每半公斤多收0.5元，平均每件貨自提點可收佣3元。如果自提點每日收200件貨，即每日賺600元，每月收入一至兩萬元。這對於一家利潤微薄的零售店來說，可能就是續租與關店的區別。而透過做兼營自提點派發包裹，也能夠獲得額外的客流量，有機會讓前來取貨的顧客購買店內其他商品，更加幫助到店鋪的經濟。
+            </p>
+            <p>當然，這種模式並非完美。當全港自提點數量激增，兼營自提點所能獲得的收益在很大程度上取決於不穩定的包裹數量，以及平台提供的包裹佣金單價。此外，容量限制這一問題也常常被忽視，一家自提點無法容納過多的包裹，而節假日或平台促銷時往往包裹數量飆升，導致包裹堆積如山，自提點無法承受，包裹溢出到自提點店鋪外的過道上，導致受到社區中其他不使用自提點的居民的反感甚至抵制。</p>
+
+            <h3>香港品牌入駐內地電商平台</h3>
+            <p>如果說經營自提點是對內地電商平台擴張市場的一種「防禦」方案，那麼主動利用這個平台，北上銷售商品，則是另一種「進攻」方案。這些平台在爭奪香港消費者的同時，也為本地商家打開了通往內地14億潛在客戶的大門。
+            </p>
+            <p>淘寶香港站、天貓國際、京東全球購等平台均向香港企業開放入駐通道。數十年以來，香港品牌在內地都享有較好的聲譽，香港商品象徵著品質與國際化，這也正是以前大量內地消費者選擇來港消費的原因。如今，電商平台提供了一個更加直接、可發展的渠道，讓香港能繼續利用聲譽優勢獲得實際收益。</p>
+            <p>香港品牌入駐內地電商平台，需要學習、了解內地消費者的消費偏好，管理商品從香港到內地的運輸鏈，並學習如何在成熟的內地電商環境下擁有競爭力。透過網上銷售，香港品牌可以無需承擔在內地開拓實體零售店的成本，就獲得全國範圍內的消費者，增加潛在收益。一旦轉型成功，成為主動的數字零售商，香港的零售企業就能獲得本地市場原本無法提供的需求規模。</p>
+            <p>總的來說，這一套數字化供應鏈可能會威脅到街邊傳統店鋪的生存，同時也可能幫助一些人靈活就業、降低成本、接觸新客戶或開闢新的收入方式。相信在未來，內地電商與香港零售還有更多的融合合作空間，例如香港本地零售店從內地網購原材料並使用，降低原本高昂的成本。從和內地電商競爭，轉變為利用它，專注於提供即時取貨、親身體驗等消費者體驗和本地化服務，而這正是內地電商平台難以替代的價值環節。
+            </p>
+        </section>
+        <hr class="divider">
+
+        <!-- ========== 第五部分：新常態 ========== -->
+        <section class="section" id="sec5">
+            <h2>內地電商的投入下，香港未來的新常態</h2>
+            <p>近三年來，內地電商在香港的發展和消費者行為的變化都不會是暫時的，香港零售環境的改變將是長期的。各平台的政策投入，各種基礎設施的建設，以及消費者的期望共同構成了香港零售未來的新常態。</p>
+
+            <h3>從免郵政策開始的網購行為固化</h3>
+            <p>作為最開始的促銷手段，免郵政策如今已發展為香港市場的固定特徵。淘寶天貓香港事業部負責人沛汐在2025年10月介紹，由於在港試行零門檻一件包郵後消費者反應熱烈，訂單量增長可觀，淘寶香港站決定將長期實行免郵政策，幾乎所有輕小件商品都可一件包郵送至自提點，預計涉及商品數量增至10億，補貼金額超過10億元人民幣。這項舉措的信號很明顯，「包郵到港」將不會是臨時的促銷手段，而是會鞏固香港市場的長期投資。
+            </p>
+            <p>其他平台同樣如此。拼多多在2024年11月就已開始實施香港包郵政策，推行「一件也包郵」，不論商品單價與重量，持續至今，獲得了大量高頻次、小額碎片化的訂單。京東則在主打送貨上門服務策略的同時，進一步擴大在港物流網絡，將沙田區的自提點從約40個增加至超過70個，其他城區也陸續增設。據京東港澳台業務負責人披露，2025年3月至10月，京東港澳用戶規模較2024年7月至2025年2月增長了120%。</p>
+            <p>運費之外，內地電商的網購文化對香港同樣影響深遠。各平台一年一度的購物節，如「618」、「雙11」等，也正在深入香港消費者的生活。2025年「雙11」活動期間，淘寶香港站平台整體流量按年錄得雙位數增長，用戶規模增長22%。京東全面佈局香港後，2026年的「618」作為首次大型購物節，京東承諾「將以最大的誠意，為香港市民帶來史無前例的優惠」。</p>
+
+            <h3>從線上銷售到佈局線下的進一步發展</h3>
+            <p>不只是線上營運政策的支持，線下實體資產的佈局，進一步表明內地電商平台在港發展的決心。
+            </p>
+            <p>2025年8月，京東收購佳寶超市，擁有了約100家分店，還計劃在今年6月18日在灣仔核心區開設香港首家京東MALL。阿里巴巴旗下的淘寶也同樣致力於香港業務實體化，PapaHome淘寶家具實體店繼2025年2月在尖沙咀中港城開設首間實體店後，正計劃進駐銅鑼灣Fashion
+            Walk，並將合作商戶數目由逾100間增至逾1000間，商品種類由約1萬款增至逾10萬款。</p>
+            <P>實體店的擴張進一步改變了本地零售競爭，內地電商不僅在價格上與本地競爭，也同時在提升本地化服務。香港傳統零售商所要面對的，將是線上線下融合的全渠道零售系統。</P>
+            <div class="carousel-container" id="carouselGallery2">
+                <div class="carousel-slides" id="carouselSlides2">
+                    <div class="carousel-slide">
+                        <img src="hkjdmall.png" alt="hkjdmall" style="width:100%; height:auto; border-radius:8px;">
+                        <small style="margin-top:8px;">香港首家京東MALL即將開業</small>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="papahome.png" alt="PapaHome" style="width:100%; height:auto; border-radius:8px;">
+                        <small style="margin-top:8px;">尖沙咀中港城的PapaHome淘寶家具實體店</small>
+                    </div>
+                </div>
+                <button class="carousel-btn prev" id="carouselPrev2">&#10094;</button>
+                <button class="carousel-btn next" id="carouselNext2">&#10095;</button>
+            </div>
+        </section>
+        <hr class="divider">
+
+        <!-- ========== 第六部分：未來展望 ========== -->
+        <section class="section" id="sec6">
+            <h2>展望未來——香港零售業適應還是淘汰？</h2>
+            <p>香港零售的未來，並非自內地電商平台南下開始就被寫定，而是取決於多個因素的互相作用下未來的發展。<p/>
+            
+            <p>首先便是政策支持，香港政府正在積極幫助企業轉型。2025年12月31日，香港數字政策辦公室宣布與香港數碼港管理有限公司合作推出「數碼企業身份」沙盒計劃，旨在協助及推動香港企業加快數字化轉型，進一步優化香港企業的營商環境。</p>
+            
+            <p>香港發展品牌、升級轉型及拓展內銷市場的專項基金（「BUD專項基金」）用於鼓勵香港非上市企業透過發展品牌、升級轉型和拓展營銷。基金上線以來不斷優化，2023年6月推出「申請易」，加快審批涉及特定措施的申請；2024年7月推出「電商易」，鼓勵企業靈活運用資助推行電子商貿項目；2025年《施政報告》宣布擴大基金的資助地域範圍20%至覆蓋多八個經濟體；2026至27年度《財政預算案》宣布，將「申請易」每宗申請的資助上限由10萬港元提升50%至15萬港元。2026年4月1日，香港商務及經濟發展局局長丘應樺在立法會會議上介紹說，截至2026年2月底，「BUD專項基金」共接獲超過32000宗申請。2025年接獲約5350宗申請，較2019年增加超過210%，反映業界對「BUD專項基金」的需求一直保持殷切。</p>
+            
+            <p>在政策的幫助下，本地零售業需要進行調整。德勤中國預測，2026年香港零售銷售有望增長近8%至約4,100億港元，其中，珠寶首飾、鐘錶及名貴禮物有望增長19%，服裝鞋履增長16%，藥物及化妝品增長11%，這間接表明正品保障、服務品質及實體店體驗仍有線上無法取代的優勢。而日用雜貨、電子產品等商品化程度高且價格透明的品類，則會受到較大衝擊。</p>
+
+            <div class="chart-container">
+                <div class="chart-title">2026年香港零售各品類增長預測</div>
+                <canvas id="chartGrowthForecast" aria-label="2026年香港零售各品類增長預測橫向條形圖"></canvas>
+                <div class="chart-source">數據來源：德勤中國 2026年預測</div>
+            </div>
+
+            <p>正如王維基所說，香港零售的處境猶如在沙漠中尋找綠洲，「如果現時咩唔做，就好容易在沙漠中渴死」。在香港消費者對內地品牌的接受度越來越高的情況下，若香港傳統百貨公司仍保持一成不變的模式運行，將面臨被淘汰的結局。淘寶、京東及拼多多三大內地電商的攻港，既能重塑香港消費者的消費模式，也能推動本地零售業升級。香港在更了解本地消費者的同時，可以借鑑內地電商平台的經驗，並與內地商家合作，保持競爭優勢。</p>
+            <blockquote>
+            「如果現時咩都唔做，就好容易在沙漠中渴死。」
+            <cite>—— 王維基，HKTV副主席</cite>
+            </blockquote>
+
+        </section>
+
+        <!-- ========== 結語 ========== -->
+        <section class="section">
+            <h2>結語：十字路口的香港零售</h2>
+            <p>內地電商平台的南下，對於香港零售業來說，既是無法避免的挑戰，也是前所未有的機遇。</p>
+            <p>挑戰在於，在香港本地人力及租金成本高昂，內地電商平台巨大的價格優勢難以改變的情況下，日用品、快速消費品的服務體驗與品質往往顯得不再重要。這場價格戰中，本地零售很難與已有多年數據分析、用戶行為追蹤、個人化推薦經驗的內地電商競爭。
+            </p>
+            <p>機遇在於，香港政府也在為本地零售的轉型與數位化提供積極幫助。跨境供應鏈為香港帶來了新的資源與銷售渠道。無論是透過自提點獲取包裹派發佣金，還是將香港品牌推廣至內地14億消費者的市場，香港零售都有機會從被動轉為主動。
+            </p>
+            <p>香港零售業的未來，不應是如何抵制內地電商平台與本地的融合。香港需在「一國兩制」的制度下，利用好自身平台，做到既有國際化大都市消費體驗，又能無縫連接內地供應鏈。而香港零售企業，則要敢於求變、善於借力，在這場融合中發掘新的市場。
+            </p>
+        </section>
+
+        <!-- ========== 頁腳 ========== -->
+        <footer class="article-footer">
+            <p><strong>數據來源與參考文章</strong></p>
+            <ul class="source-list">
+                <li>香港政府統計處 · 零售業總銷貨額</li>
+                <li>摩根大通 · 2025年12月報告</li>
+                <li>德勤中國 · 2026年零售預測</li>
+                <li>仲量聯行 · 2026年4月展望報告</li>
+                <li>差餉物業估價署 · 零售物業數據</li>
+                <li>Statrys · 香港網購用戶調查</li>
+                <li>香港小微企業商業信心指數</li>
+                <li>香港01 · 自提點運營數據</li>
+            </ul>
+            <p style="margin-top:14px;">© 劉懿華</p>
+        </footer>
+    </main>
+
+    <!-- ========== 右侧时间轴面板 ========== -->
+    <div class="timeline-panel" id="timelinePanel">
+        <div class="timeline-panel-tab" id="timelinePanelTab">
+            <span>香港零售業生態演變全景圖（2020–2026）</span>
+            <span class="tab-arrow">◀</span>
+        </div>
+        <div class="timeline-panel-content" id="timelinePanelContent">
+            <h3 class="timeline-panel-title">香港零售業生態演變全景圖（2020–2026）</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">2020年1月開始</div>
+                    <div class="timeline-content">受新冠疫情影響，香港陸續關閉口岸並限制入境。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2020年7月</div>
+                    <div class="timeline-content">香港推出「口罩令」，要求市民全面配戴口罩。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2020年</div>
+                    <div class="timeline-content">香港零售業銷貨價值同比下降24.3%。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2022年6月</div>
+                    <div class="timeline-content">拼多多開通香港官方集運服務。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2023年3月</div>
+                    <div class="timeline-content">實施959天的「口罩令」全面取消，所有社交距離措施正式結束，香港邁入全面復常階段。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2024年7月</div>
+                    <div class="timeline-content">香港政府推出「電商易」，鼓勵企業靈活運用資助推行電子商貿項目。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2024年10月</div>
+                    <div class="timeline-content">淘寶香港站推出「滿99元人民幣包郵」，購買標有「¥99包郵」的商品達99元人民幣即可享免運費到港。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2024年11月</div>
+                    <div class="timeline-content">拼多多推出無門檻、無次數限制的「包郵到港」服務，由平台直接補貼香港段運費。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年2月</div>
+                    <div class="timeline-content">淘寶在尖沙咀中港城開設首間實體店PapaHome。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年8月</div>
+                    <div class="timeline-content">淘寶香港站優化退貨服務，帶有「HK本地退」標示的商品，每名用戶每月有最多5次免費上門退貨機會。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年8月</div>
+                    <div class="timeline-content">京東正式完成對香港佳寶食品超級市場的收購，進軍香港的實體零售領域。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年10月</div>
+                    <div class="timeline-content">淘寶香港站決定將長期實行免郵政策，預計補貼金額超過10億元人民幣。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年11月</div>
+                    <div class="timeline-content">「雙11」活動期間，淘寶香港用戶規模增長22%。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年12月</div>
+                    <div class="timeline-content">京東以34.73億港元購入中環建設銀行大廈部分樓層。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年12月</div>
+                    <div class="timeline-content">摩根大通發佈報告：拼多多在港市場份額從12%激增至28%。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026年2月</div>
+                    <div class="timeline-content">發展品牌、升級轉型及拓展內銷市場的專項基金「BUD專項基金」共接獲超過32000宗申請。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026年6月</div>
+                    <div class="timeline-content">香港首家京東MALL門店計劃在灣仔開業，全渠道零售加速。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 返回頂部按鈕 ==================== -->
+    <button class="back-to-top" id="backToTop" aria-label="回到頂部" title="回到頂部">↑</button>
+
+    <!-- ==================== 腳本 ==================== -->
+    <script>
+        // ============ 側邊欄控制 ============
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarToggleFloating = document.getElementById('sidebarToggleFloating');
+        const body = document.body;
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('active');
+            body.classList.add('sidebar-open');
+            sidebarToggleFloating.classList.add('hidden-btn');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            body.classList.remove('sidebar-open');
+            sidebarToggleFloating.classList.remove('hidden-btn');
+        }
+
+        sidebarToggleFloating.addEventListener('click', openSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // 點擊側邊欄內鏈接後關閉（移動端體驗）
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // ESC 關閉
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                closeSidebar();
+            }
+        });
+
+        // ============ 返回頂部按鈕 ============
+        const backToTopBtn = document.getElementById('backToTop');
+        function handleScroll() {
+            if (window.scrollY > 500) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        }
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        handleScroll();
+
+        // ============ Info Card 點擊展開詳情 ============
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.addEventListener('click', function (e) {
+                // 如果點擊的是內部鏈接或按鈕，避免衝突
+                if (e.target.closest('a') || e.target.closest('button')) return;
+                this.classList.toggle('expanded');
+                const detailDiv = this.querySelector('.info-detail');
+                if (detailDiv && !detailDiv.textContent.trim()) {
+                    const detailText = this.getAttribute('data-detail') || '暫無詳細說明。';
+                    detailDiv.textContent = detailText;
+                }
+            });
+        });
+
+        // ============ 圖集輪播 ============
+        const slidesContainer = document.getElementById('carouselSlides');
+        const prevBtn = document.getElementById('carouselPrev');
+        const nextBtn = document.getElementById('carouselNext');
+        if (slidesContainer && prevBtn && nextBtn) {
+            const slides = slidesContainer.querySelectorAll('.carousel-slide');
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+
+            function updateSlidePosition() {
+                slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+            }
+
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex === 0) ? totalSlides - 1 : currentIndex - 1;
+                updateSlidePosition();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex === totalSlides - 1) ? 0 : currentIndex + 1;
+                updateSlidePosition();
+            });
+
+            // 觸摸滑動支持
+            let touchStartX = 0;
+            let touchEndX = 0;
+            slidesContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            slidesContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            function handleSwipe() {
+                const threshold = 50;
+                if (touchEndX < touchStartX - threshold) {
+                    // 左滑
+                    currentIndex = (currentIndex === totalSlides - 1) ? 0 : currentIndex + 1;
+                    updateSlidePosition();
+                } else if (touchEndX > touchStartX + threshold) {
+                    // 右滑
+                    currentIndex = (currentIndex === 0) ? totalSlides - 1 : currentIndex - 1;
+                    updateSlidePosition();
+                }
+            }
+        }
+
+        // 初始化第二个图集轮播
+            (function () {
+                const slidesContainer2 = document.getElementById('carouselSlides2');
+                const prevBtn2 = document.getElementById('carouselPrev2');
+                const nextBtn2 = document.getElementById('carouselNext2');
+                if (!slidesContainer2 || !prevBtn2 || !nextBtn2) return;
+
+                const slides2 = slidesContainer2.querySelectorAll('.carousel-slide');
+                let currentIndex2 = 0;
+                const totalSlides2 = slides2.length;
+
+                function updateSlide2() {
+                    slidesContainer2.style.transform = `translateX(-${currentIndex2 * 100}%)`;
+                }
+
+                prevBtn2.addEventListener('click', () => {
+                    currentIndex2 = (currentIndex2 === 0) ? totalSlides2 - 1 : currentIndex2 - 1;
+                    updateSlide2();
+                });
+                nextBtn2.addEventListener('click', () => {
+                    currentIndex2 = (currentIndex2 === totalSlides2 - 1) ? 0 : currentIndex2 + 1;
+                    updateSlide2();
+                });
+
+                // 触摸滑动支持
+                let touchStartX2 = 0, touchEndX2 = 0;
+                slidesContainer2.addEventListener('touchstart', (e) => {
+                    touchStartX2 = e.changedTouches[0].screenX;
+                }, { passive: true });
+                slidesContainer2.addEventListener('touchend', (e) => {
+                    touchEndX2 = e.changedTouches[0].screenX;
+                    const threshold = 50;
+                    if (touchEndX2 < touchStartX2 - threshold) {
+                        currentIndex2 = (currentIndex2 === totalSlides2 - 1) ? 0 : currentIndex2 + 1;
+                        updateSlide2();
+                    } else if (touchEndX2 > touchStartX2 + threshold) {
+                        currentIndex2 = (currentIndex2 === 0) ? totalSlides2 - 1 : currentIndex2 - 1;
+                        updateSlide2();
+                    }
+                });
+            })();
+
+        // ============ 右侧时间轴面板展开/收起 ============
+            const timelinePanel = document.getElementById('timelinePanel');
+            const timelinePanelTab = document.getElementById('timelinePanelTab');
+
+            if (timelinePanel && timelinePanelTab) {
+                timelinePanelTab.addEventListener('click', function () {
+                    timelinePanel.classList.toggle('expanded');
+                });
+            }
+
+        // ============ 圖表初始化 ============
+        // Chart 1: 香港零售業總銷貨價值趨勢
+        (function () {
+            const ctx = document.getElementById('chartRetailValue');
+            if (!ctx) return;
+            const labels = ['2019', '2020', '2021', '2022', '2023', '2024', '2025'];
+            const salesValues = [4312, 3264, 3528, 3499, 4066.49, 3768.47, 3804.45];
+            const yoyPercent = [null, -24.3, 8.1, -0.8, 16.2, -7.3, 1.0];
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '零售業總銷貨價值（億港元）',
+                        data: salesValues,
+                        backgroundColor: ['#f5c6cb', '#f8d7da', '#fde8e8', '#fde8e8', '#f5c6cb',
+                            '#e8a0a8', '#f0b8bf'
+                        ],
+                        borderColor: '#b91c1c',
+                        borderWidth: 1.5,
+                        borderRadius: 6,
+                        order: 2,
+                        yAxisID: 'y',
+                    }, {
+                        label: '按年變動百分率（%）',
+                        data: yoyPercent,
+                        type: 'line',
+                        borderColor: '#1a1a1a',
+                        backgroundColor: '#1a1a1a',
+                        borderWidth: 2.5,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#1a1a1a',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        tension: 0.35,
+                        fill: false,
+                        order: 1,
+                        yAxisID: 'y1',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
+                    plugins: {
+                        legend: {
+                            position: 'bottom', labels: {
+                                usePointStyle: true,
+                                pointStyleWidth: 8, padding: 20, font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    if (ctx.datasetIndex === 1) return '按年變動: ' + (ctx.raw !==
+                                        null ? (ctx.raw > 0 ? '+' : '') + ctx.raw + '%' : '—');
+                                    return '銷貨價值: ' + ctx.raw.toLocaleString('zh-HK') + ' 億港元';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear', position: 'left', title: {
+                                display: true, text: '億港元',
+                                font: { size: 11 }
+                            }, min: 2800, max: 4800, ticks: {
+                                callback: v => v
+                                    .toLocaleString('zh-HK')
+                            }, grid: { color: '#f8e8e8' }
+                        },
+                        y1: {
+                            type: 'linear', position: 'right', title: {
+                                display: true,
+                                text: '按年變動 %', font: { size: 11 }
+                            }, min: -30, max: 25,
+                            ticks: { callback: v => (v > 0 ? '+' : '') + v + '%' },
+                            grid: { drawOnChartArea: false }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    interaction: { mode: 'index', intersect: false }
+                }
+            });
+        })();
+
+        // Chart 2: 內地電商市場份額
+        (function () {
+            const ctx = document.getElementById('chartMarketShare');
+            if (!ctx) return;
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月'];
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: '拼多多',
+                            data: [12, 13.8, 15.6, 17.4, 19.2, 21.0, 22.8, 24.6, 26.4, 28],
+                            borderColor: '#E60012',
+                            backgroundColor: 'rgba(230,0,18,0.08)',
+                            borderWidth: 2.8,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#E60012',   // 点的颜色
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            tension: 0.4,
+                            fill: true 
+                        },
+                        {
+                            label: '淘寶', data: [30, 30.2, 30.5, 30.8, 31.0, 31.2, 31.3, 31.5, 31.7,
+                                32
+                            ], borderColor: '#FF6600', backgroundColor: 'rgba(255,102,0,0.08)',
+                            borderWidth: 2.8, pointRadius: 5, pointBackgroundColor: '#FF6600',
+                            pointBorderColor: '#fff', pointBorderWidth: 2, tension: 0.35, fill: true
+                        },
+                        {
+                            label: '京東', data: [10, 10.6, 11.1, 11.7, 12.2, 12.8, 13.3, 13.9, 14.4,
+                                15
+                            ], borderColor: '#0078D4', backgroundColor: 'rgba(0,120,212,0.08)',
+                            borderWidth: 2.8, pointRadius: 5, pointBackgroundColor: '#0078D4',
+                            pointBorderColor: '#fff', pointBorderWidth: 2, tension: 0.4, fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
+                    plugins: {
+                        legend: {
+                            position: 'bottom', labels: {
+                                usePointStyle: true,
+                                pointStyleWidth: 8, padding: 20, font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ctx.dataset.label + ': ' + ctx.raw
+                                    .toFixed(1) + '%'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 5, max: 38, ticks: { callback: v => v + '%' }, title: {
+                                display: true,
+                                text: '市場份額 (%)', font: { size: 11 }
+                            },
+                            grid: { color: '#f8e8e8' }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    interaction: { mode: 'index', intersect: false }
+                }
+            });
+        })();
+
+        // Chart 3: 價格差距
+        (function () {
+            const ctx = document.getElementById('chartPriceGap');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['日用雜貨', '家用電器', '數碼配件', '生活用品', '方便食品'],
+                    datasets: [{
+                        label: '內地電商較本地零售便宜幅度 (%)', data: [42, 56, 38, 35, 30],
+                        backgroundColor: ['#e57373', '#ef5350', '#f06292', '#e57373', '#ef9a9a'],
+                        borderColor: '#b91c1c', borderWidth: 1.2, borderRadius: 8,
+                        borderSkipped: false
+                    }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.6,
+                    plugins: {
+                        legend: { display: false }, tooltip: {
+                            callbacks: {
+                                label: ctx =>
+                                    '便宜 ' + ctx.raw + '%'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0, max: 65, ticks: { callback: v => v + '%' }, title: {
+                                display: true,
+                                text: '價格差距幅度', font: { size: 11 }
+                            },
+                            grid: { color: '#f8e8e8' }
+                        },
+                        y: { grid: { display: false }, ticks: { font: { size: 12, weight: '500' } } }
+                    }
+                }
+            });
+        })();
+
+        // Chart 4: 2026年各品類增長預測
+        (function () {
+            const ctx = document.getElementById('chartGrowthForecast');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['珠寶首飾、鐘錶\n及名貴禮物', '服裝鞋履', '藥物及化妝品', '百貨', '食品及酒類', '電子產品'],
+                    datasets: [{
+                        label: '預測增長率 (%)', data: [19, 16, 11, 10, 7, 3],
+                        backgroundColor: ['#c62828', '#d32f2f', '#e57373', '#ef9a9a', '#f5c6cb',
+                            '#fde8e8'
+                        ], borderColor: '#8b0000', borderWidth: 1, borderRadius: 8,
+                        borderSkipped: false
+                    }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5,
+                    plugins: {
+                        legend: { display: false }, tooltip: {
+                            callbacks: {
+                                label: ctx =>
+                                    '預測增長: +' + ctx.raw + '%'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0, max: 24, ticks: { callback: v => '+' + v + '%' }, title: {
+                                display: true,
+                                text: '預測增長率', font: { size: 11 }
+                            },
+                            grid: { color: '#f8e8e8' }
+                        },
+                        y: { grid: { display: false }, ticks: { font: { size: 11, weight: '500' } } }
+                    }
+                }
+            });
+        })();
+
+    </script>
+</body>
+
+</html>
